@@ -124,7 +124,7 @@ def seed_data():
 
     # Demo user
     demo = User(name='Rahul Sharma', email='demo@nexomart.com',
-                phone='9876543210', password=generate_password_hash('demo123'))
+                phone='9876543210', password_hash=generate_password_hash('demo123'))
     db.session.add(demo)
     db.session.commit()
     print("✅ Database seeded successfully!")

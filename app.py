@@ -31,7 +31,7 @@ def register():
         
         hashed_password = generate_password_hash(password)
         user = User(name=name, email=email, phone=phone,
-                    password=hashed_password)
+                    password_hash=hashed_password)
         
 
         db.session.add(user)
@@ -46,9 +46,9 @@ def login():
         email = request.form['email']
         password = request.form['password']
         user = User.query.filter_by(email=email).first()
-        
+
         # if user and check_password_hash(user.password, password):
-        if user and check_password_hash(user.password, password):
+        if user and check_password_hash(user.password_hash, password):
             session['user_id'] = user.id
             session['user_name'] = user.name
             flash(f'Welcome back, {user.name}!', 'success')
@@ -343,9 +343,26 @@ def inject_globals():
     return dict(cart_count=cart_count, all_categories=categories,
                 current_year=datetime.now().year)
 
+@app.route('/admin')
+def admin_dashboard():
+    print("ADMIN ROUTE HIT")
+    if not session.get('user_id'):
+        return redirect(url_for('login'))
+
+    user = User.query.get(session['user_id'])
+
+    if user.role != 'admin':
+        flash('Access denied', 'danger')
+        return redirect(url_for('index'))
+
+    return render_template('admin/dashboard.html')
+
+print(app.url_map)
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
         from seed import seed_data
         seed_data()
     app.run(debug=True)
+
+
