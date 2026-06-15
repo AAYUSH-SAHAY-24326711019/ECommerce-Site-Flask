@@ -1,5 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify
 from database import db, User, Product, Order, OrderItem, CartItem, Category, Review, Address
+# from werkzeug.security import generate_password_hash, check_password_hash
+
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime, timedelta
 import random
@@ -26,8 +28,12 @@ def register():
         if User.query.filter_by(email=email).first():
             flash('Email already registered!', 'danger')
             return redirect(url_for('register'))
+        
+        hashed_password = generate_password_hash(password)
         user = User(name=name, email=email, phone=phone,
-                    password=generate_password_hash(password))
+                    password=hashed_password)
+        
+
         db.session.add(user)
         db.session.commit()
         flash('Account created! Please login.', 'success')
@@ -40,6 +46,8 @@ def login():
         email = request.form['email']
         password = request.form['password']
         user = User.query.filter_by(email=email).first()
+        
+        # if user and check_password_hash(user.password, password):
         if user and check_password_hash(user.password, password):
             session['user_id'] = user.id
             session['user_name'] = user.name

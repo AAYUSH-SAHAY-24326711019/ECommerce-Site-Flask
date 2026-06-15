@@ -1,2 +1,30 @@
 python -m venv venv
 venv\Scripts\activate
+ FLASK_APP=app.py
+ flask shell
+ >>> admin = User(name="Administrator",email="admin@site.com",password_hash=generate_password_hash("admin"),role="admin") 
+ Instance: C:\Users\Lenovo\Desktop\nexomart 2\instance
+>>> from app import app
+>>> from database import db
+>>> with app.app_context():
+...  db.create_all()
+... 
+>>> result = db.session.execute(db.text("PRAGMA table_info(user)"))
+ 
+>>> for row in result:
+...  print(row)
+... 
+(0, 'id', 'INTEGER', 1, None, 1)
+(1, 'name', 'VARCHAR(100)', 1, None, 0)
+(2, 'email', 'VARCHAR(120)', 1, None, 0)
+(3, 'phone', 'VARCHAR(15)', 0, None, 0)
+(4, 'password_hash', 'VARCHAR(255)', 1, None, 0)
+(5, 'role', 'VARCHAR(20)', 1, None, 0)
+(6, 'is_active', 'BOOLEAN', 0, None, 0)
+(7, 'wishlist', 'TEXT', 0, None, 0)
+(8, 'created_at', 'DATETIME', 0, None, 0)
+>>> from werkzeug.security import generate_password_hash
+>>> from database import User
+>>> admin = User(name="Administrator",email="admin@site.com",password_hash=generate_password_hash("admin"),role="admin")              
+>>> db.session.add(admin)
+>>> db.session.commit()
